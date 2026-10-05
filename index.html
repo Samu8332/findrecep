@@ -1,0 +1,1708 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Recipe Finder</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    color:white;
+
+    background:
+    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.75)),
+    url("https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=2000&q=85");
+
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+}
+
+/* NAVBAR */
+
+nav{
+    width:100%;
+    padding:20px 7%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background:rgba(0,0,0,.4);
+    backdrop-filter:blur(10px);
+
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#ffb703;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    margin-left:25px;
+}
+
+nav a:hover{
+    color:#ffb703;
+}
+
+/* HERO */
+
+.hero{
+    min-height:470px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:60px 20px;
+}
+
+.hero-content{
+    max-width:850px;
+}
+
+.hero h1{
+    font-size:58px;
+    margin-bottom:18px;
+}
+
+.hero h1 span{
+    color:#ffb703;
+}
+
+.hero p{
+    font-size:19px;
+    color:#eee;
+    margin-bottom:30px;
+}
+
+/* SEARCH */
+
+.search-box{
+    width:100%;
+    max-width:700px;
+    margin:auto;
+
+    display:flex;
+    background:white;
+    border-radius:50px;
+    padding:7px;
+
+    box-shadow:0 10px 35px rgba(0,0,0,.4);
+}
+
+.search-box input{
+    flex:1;
+    border:none;
+    outline:none;
+    padding:17px 22px;
+    font-size:16px;
+    border-radius:50px;
+    color:#333;
+}
+
+.search-box button{
+    border:none;
+    background:#ff7b00;
+    color:white;
+
+    padding:0 30px;
+    border-radius:50px;
+
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.search-box button:hover{
+    background:#ff9d00;
+    transform:scale(1.03);
+}
+
+/* SUGGESTIONS */
+
+.suggestions{
+    margin-top:25px;
+}
+
+.suggestions span{
+    display:inline-block;
+
+    background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.3);
+
+    padding:9px 16px;
+    margin:5px;
+
+    border-radius:25px;
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.suggestions span:hover{
+    background:#ff7b00;
+}
+
+/* CONTAINER */
+
+.container{
+    width:90%;
+    max-width:1100px;
+    margin:auto;
+    padding-bottom:70px;
+}
+
+#result{
+    display:none;
+}
+
+/* RECIPE CARD */
+
+.recipe-card{
+    background:rgba(255,255,255,.97);
+    color:#222;
+
+    border-radius:25px;
+    overflow:hidden;
+
+    box-shadow:0 15px 50px rgba(0,0,0,.5);
+
+    animation:showRecipe .6s ease;
+}
+
+@keyframes showRecipe{
+
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+/* HEADER */
+
+.recipe-header{
+    padding:35px;
+    background:linear-gradient(135deg,#ff7b00,#ffb703);
+    color:white;
+}
+
+.recipe-header h2{
+    font-size:38px;
+    margin-bottom:12px;
+}
+
+.recipe-info{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+.info-box{
+    background:rgba(255,255,255,.2);
+    padding:10px 16px;
+    border-radius:20px;
+}
+
+/* BODY */
+
+.recipe-body{
+    padding:35px;
+
+    display:grid;
+    grid-template-columns:1fr 1.5fr;
+    gap:40px;
+}
+
+.section-title{
+    font-size:24px;
+    margin-bottom:20px;
+    color:#ff7b00;
+}
+
+/* INGREDIENTS */
+
+.ingredients{
+    list-style:none;
+}
+
+.ingredients li{
+    padding:12px 15px;
+    margin-bottom:9px;
+
+    background:#fff5e9;
+    border-left:4px solid #ff7b00;
+
+    border-radius:8px;
+}
+
+.ingredients li::before{
+    content:"✓";
+    color:#ff7b00;
+    font-weight:bold;
+    margin-right:10px;
+}
+
+/* STEPS */
+
+.step{
+    display:flex;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.step-number{
+    min-width:38px;
+    height:38px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#ff7b00;
+    color:white;
+
+    border-radius:50%;
+    font-weight:bold;
+}
+
+.step p{
+    line-height:1.6;
+    color:#444;
+}
+
+/* ERROR */
+
+.error{
+    display:none;
+
+    background:rgba(255,255,255,.95);
+    color:#333;
+
+    max-width:600px;
+    margin:30px auto;
+
+    padding:25px;
+    text-align:center;
+
+    border-radius:15px;
+}
+
+.error h3{
+    color:#ff5a00;
+    margin-bottom:10px;
+}
+
+/* FOOTER */
+
+footer{
+    text-align:center;
+    padding:25px;
+    background:rgba(0,0,0,.5);
+    color:#ddd;
+}
+
+footer span{
+    color:#ffb703;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    nav{
+        padding:18px 5%;
+    }
+
+    nav .links{
+        display:none;
+    }
+
+    .hero h1{
+        font-size:40px;
+    }
+
+    .hero p{
+        font-size:16px;
+    }
+
+    .search-box{
+        flex-direction:column;
+        background:transparent;
+        box-shadow:none;
+        gap:10px;
+    }
+
+    .search-box input{
+        padding:17px;
+    }
+
+    .search-box button{
+        height:52px;
+    }
+
+    .recipe-body{
+        grid-template-columns:1fr;
+    }
+
+    .recipe-header h2{
+        font-size:30px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<nav>
+
+<div class="logo">
+🍴 Recipe<span>Finder</span>
+</div>
+
+<div class="links">
+<a href="#">Home</a>
+<a href="#recipe">Recipes</a>
+</div>
+
+</nav>
+
+
+<section class="hero">
+
+<div class="hero-content">
+
+<h1>
+Discover Your <span>Perfect Recipe</span>
+</h1>
+
+<p>
+Search any food and instantly get ingredients,
+cooking time and step-by-step cooking instructions.
+</p>
+
+<div class="search-box">
+
+<input
+type="text"
+id="foodInput"
+placeholder="Example: Chicken Curry"
+onkeydown="handleEnter(event)"
+>
+
+<button onclick="findRecipe()">
+🔍 Search
+</button>
+
+</div>
+
+
+<div class="suggestions">
+
+<span onclick="selectFood('Pizza')">🍕 Pizza</span>
+
+<span onclick="selectFood('Burger')">🍔 Burger</span>
+
+<span onclick="selectFood('Biryani')">🍗 Biryani</span>
+
+<span onclick="selectFood('Chicken Curry')">🍛 Chicken Curry</span>
+
+<span onclick="selectFood('Dosa')">🥞 Dosa</span>
+
+<span onclick="selectFood('Paneer Butter Masala')">🧀 Paneer</span>
+
+<span onclick="selectFood('Fried Rice')">🍚 Fried Rice</span>
+
+<span onclick="selectFood('Gulab Jamun')">🍮 Gulab Jamun</span>
+
+</div>
+
+</div>
+
+</section>
+
+
+<main class="container" id="recipe">
+
+<div id="result"></div>
+
+<div class="error" id="error">
+
+<h3>😕 Recipe Not Found</h3>
+
+<p>
+Try searching for Pizza, Biryani, Chicken Curry,
+Dosa, Paneer or another food.
+</p>
+
+</div>
+
+</main>
+
+
+<footer>
+
+Made with ❤️ using
+<span>HTML, CSS & JavaScript</span>
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+                RECIPE DATABASE
+===================================================== */
+
+const recipes = {
+
+pizza:{
+name:"Cheese Pizza",
+category:"Italian",
+time:"30 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups all-purpose flour",
+"1 teaspoon dry yeast",
+"1 teaspoon sugar",
+"½ teaspoon salt",
+"¾ cup warm water",
+"2 tablespoons olive oil",
+"½ cup pizza sauce",
+"1 cup mozzarella cheese",
+"Oregano",
+"Chilli flakes"
+],
+
+steps:[
+"Mix flour, yeast, sugar and salt.",
+"Add warm water and olive oil and prepare a soft dough.",
+"Cover and rest the dough for 1 hour.",
+"Roll the dough into a circular pizza base.",
+"Spread pizza sauce over the base.",
+"Add mozzarella cheese.",
+"Sprinkle oregano and chilli flakes.",
+"Bake at 200°C for 15–20 minutes.",
+"Slice and serve hot."
+]
+},
+
+
+burger:{
+name:"Classic Burger",
+category:"Fast Food",
+time:"25 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 burger buns",
+"2 vegetable or chicken patties",
+"2 cheese slices",
+"Lettuce",
+"Tomato",
+"Onion",
+"Mayonnaise",
+"Tomato ketchup",
+"Salt",
+"Black pepper"
+],
+
+steps:[
+"Heat a pan and cook the patties.",
+"Toast the burger buns.",
+"Apply mayonnaise and ketchup.",
+"Add lettuce and tomato.",
+"Place the cooked patty.",
+"Add cheese and onion.",
+"Cover with the top bun.",
+"Serve hot."
+]
+},
+
+
+biryani:{
+name:"Chicken Biryani",
+category:"Indian",
+time:"60 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"500g chicken",
+"2 cups basmati rice",
+"2 onions",
+"2 tomatoes",
+"1 cup yogurt",
+"2 tablespoons ginger garlic paste",
+"Biryani masala",
+"Mint leaves",
+"Coriander leaves",
+"Cooking oil",
+"Salt",
+"Whole spices"
+],
+
+steps:[
+"Wash and soak basmati rice for 20 minutes.",
+"Marinate chicken with yogurt and spices.",
+"Fry sliced onions until golden.",
+"Cook chicken with tomatoes and spices.",
+"Boil rice until partially cooked.",
+"Layer rice over the chicken.",
+"Add mint, coriander and fried onions.",
+"Cover and cook on low flame for 20 minutes.",
+"Mix gently and serve hot."
+]
+},
+
+
+pasta:{
+name:"Creamy Pasta",
+category:"Italian",
+time:"25 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"200g pasta",
+"2 tablespoons butter",
+"3 garlic cloves",
+"1 cup milk",
+"½ cup cream",
+"½ cup cheese",
+"Black pepper",
+"Chilli flakes",
+"Salt",
+"Oregano"
+],
+
+steps:[
+"Boil pasta in salted water.",
+"Heat butter in a pan.",
+"Add chopped garlic.",
+"Add milk and cream.",
+"Add cheese and allow it to melt.",
+"Add salt and pepper.",
+"Add cooked pasta.",
+"Sprinkle oregano and chilli flakes.",
+"Serve hot."
+]
+},
+
+
+pancakes:{
+name:"Fluffy Pancakes",
+category:"Breakfast",
+time:"20 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"1 cup flour",
+"1 tablespoon sugar",
+"1 teaspoon baking powder",
+"1 egg",
+"¾ cup milk",
+"2 tablespoons melted butter",
+"Salt",
+"Honey"
+],
+
+steps:[
+"Mix flour, sugar, baking powder and salt.",
+"Add egg, milk and melted butter.",
+"Whisk into a smooth batter.",
+"Heat a non-stick pan.",
+"Pour batter onto the pan.",
+"Cook until bubbles appear.",
+"Flip and cook the other side.",
+"Serve with honey."
+]
+},
+
+
+chickencurry:{
+name:"Chicken Curry",
+category:"Indian",
+time:"45 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"500g chicken",
+"2 onions",
+"2 tomatoes",
+"1 tablespoon ginger garlic paste",
+"1 teaspoon turmeric",
+"2 teaspoons chilli powder",
+"1 teaspoon coriander powder",
+"½ teaspoon garam masala",
+"Cooking oil",
+"Salt",
+"Coriander leaves"
+],
+
+steps:[
+"Heat oil in a pan.",
+"Add onions and fry until golden.",
+"Add ginger garlic paste.",
+"Add tomatoes and cook until soft.",
+"Add turmeric, chilli and coriander powder.",
+"Add chicken and mix well.",
+"Cover and cook for 25–30 minutes.",
+"Add garam masala.",
+"Garnish with coriander and serve."
+]
+},
+
+
+friedrice:{
+name:"Vegetable Fried Rice",
+category:"Chinese",
+time:"25 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups cooked rice",
+"1 cup mixed vegetables",
+"1 onion",
+"2 garlic cloves",
+"1 tablespoon soy sauce",
+"1 teaspoon vinegar",
+"Black pepper",
+"Salt",
+"2 tablespoons cooking oil"
+],
+
+steps:[
+"Heat oil in a wok.",
+"Add garlic and onion.",
+"Add chopped vegetables.",
+"Stir fry on high flame.",
+"Add cooked rice.",
+"Add soy sauce and vinegar.",
+"Season with salt and pepper.",
+"Mix well and serve hot."
+]
+},
+
+
+noodles:{
+name:"Vegetable Noodles",
+category:"Chinese",
+time:"20 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"200g noodles",
+"1 carrot",
+"1 capsicum",
+"1 onion",
+"2 garlic cloves",
+"1 tablespoon soy sauce",
+"1 teaspoon vinegar",
+"Black pepper",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Boil noodles according to package instructions.",
+"Drain and keep aside.",
+"Heat oil in a wok.",
+"Add garlic and vegetables.",
+"Stir fry on high flame.",
+"Add boiled noodles.",
+"Add soy sauce and vinegar.",
+"Mix everything well.",
+"Serve hot."
+]
+},
+
+
+paneerbuttermasala:{
+name:"Paneer Butter Masala",
+category:"North Indian",
+time:"40 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"250g paneer",
+"2 tomatoes",
+"1 onion",
+"2 tablespoons butter",
+"1 tablespoon cream",
+"1 teaspoon ginger garlic paste",
+"1 teaspoon chilli powder",
+"½ teaspoon turmeric",
+"1 teaspoon garam masala",
+"Salt",
+"Coriander"
+],
+
+steps:[
+"Cut paneer into cubes.",
+"Heat butter in a pan.",
+"Add onion and cook until soft.",
+"Add ginger garlic paste.",
+"Add tomatoes and cook well.",
+"Add spices and salt.",
+"Blend the cooked mixture if desired.",
+"Add paneer cubes.",
+"Add cream and garam masala.",
+"Cook for 5 minutes and serve."
+]
+},
+
+
+paneertikka:{
+name:"Paneer Tikka",
+category:"Indian",
+time:"35 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"250g paneer",
+"½ cup yogurt",
+"1 teaspoon chilli powder",
+"½ teaspoon turmeric",
+"1 teaspoon garam masala",
+"1 capsicum",
+"1 onion",
+"1 tablespoon lemon juice",
+"Salt"
+],
+
+steps:[
+"Cut paneer, onion and capsicum into cubes.",
+"Mix yogurt and spices.",
+"Add paneer and vegetables.",
+"Marinate for 30 minutes.",
+"Thread onto skewers.",
+"Grill or cook on a pan.",
+"Turn occasionally until golden.",
+"Serve with lemon and chutney."
+]
+},
+
+
+dosa:{
+name:"Masala Dosa",
+category:"South Indian",
+time:"30 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"2 cups dosa batter",
+"3 potatoes",
+"1 onion",
+"2 green chillies",
+"½ teaspoon mustard seeds",
+"½ teaspoon turmeric",
+"Curry leaves",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Boil and mash potatoes.",
+"Heat oil and add mustard seeds.",
+"Add onion, chillies and curry leaves.",
+"Add turmeric and potatoes.",
+"Cook the potato filling.",
+"Heat a dosa pan.",
+"Spread dosa batter into a thin circle.",
+"Add potato filling.",
+"Fold and serve with chutney."
+]
+},
+
+
+idli:{
+name:"Soft Idli",
+category:"South Indian",
+time:"30 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups idli batter",
+"Water",
+"Salt",
+"Oil"
+],
+
+steps:[
+"Prepare the idli batter.",
+"Grease the idli plates lightly.",
+"Pour batter into the molds.",
+"Steam for 10–15 minutes.",
+"Check with a toothpick.",
+"Remove carefully.",
+"Serve hot with chutney and sambar."
+]
+},
+
+
+sambar:{
+name:"South Indian Sambar",
+category:"South Indian",
+time:"40 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"1 cup toor dal",
+"1 tomato",
+"1 onion",
+"Mixed vegetables",
+"2 tablespoons sambar powder",
+"½ teaspoon turmeric",
+"Tamarind",
+"Mustard seeds",
+"Curry leaves",
+"Salt"
+],
+
+steps:[
+"Wash and pressure cook the dal.",
+"Cook vegetables separately.",
+"Add tomato and onion.",
+"Add sambar powder and turmeric.",
+"Add cooked dal.",
+"Add tamarind water.",
+"Boil everything together.",
+"Prepare tempering with mustard seeds and curry leaves.",
+"Add tempering and serve."
+]
+},
+
+
+curdrice:{
+name:"Curd Rice",
+category:"South Indian",
+time:"15 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups cooked rice",
+"1 cup curd",
+"½ cup milk",
+"Green chilli",
+"Ginger",
+"Mustard seeds",
+"Curry leaves",
+"Salt"
+],
+
+steps:[
+"Cool the cooked rice.",
+"Add curd and milk.",
+"Mix until smooth.",
+"Heat a little oil.",
+"Add mustard seeds.",
+"Add ginger, chilli and curry leaves.",
+"Add tempering to the rice.",
+"Mix well and serve."
+]
+},
+
+
+tomatorice:{
+name:"Tomato Rice",
+category:"South Indian",
+time:"25 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups cooked rice",
+"3 tomatoes",
+"1 onion",
+"2 green chillies",
+"Ginger garlic paste",
+"Turmeric",
+"Chilli powder",
+"Salt",
+"Cooking oil",
+"Coriander"
+],
+
+steps:[
+"Heat oil in a pan.",
+"Add onion and green chilli.",
+"Add ginger garlic paste.",
+"Add chopped tomatoes.",
+"Add turmeric and chilli powder.",
+"Cook until tomatoes become soft.",
+"Add cooked rice.",
+"Mix everything well.",
+"Garnish with coriander."
+]
+},
+
+
+eggCurry:{
+name:"Egg Curry",
+category:"Indian",
+time:"30 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"4 boiled eggs",
+"2 onions",
+"2 tomatoes",
+"Ginger garlic paste",
+"Turmeric",
+"Chilli powder",
+"Garam masala",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Boil and peel the eggs.",
+"Heat oil in a pan.",
+"Fry the eggs lightly.",
+"Cook onions until golden.",
+"Add ginger garlic paste.",
+"Add tomatoes and spices.",
+"Cook until oil separates.",
+"Add eggs.",
+"Cook for 5–10 minutes and serve."
+]
+},
+
+
+eggfriedrice:{
+name:"Egg Fried Rice",
+category:"Chinese",
+time:"20 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups cooked rice",
+"2 eggs",
+"1 onion",
+"1 carrot",
+"Capsicum",
+"Soy sauce",
+"Black pepper",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Heat oil in a wok.",
+"Add beaten eggs and scramble.",
+"Add onion and vegetables.",
+"Stir fry on high flame.",
+"Add cooked rice.",
+"Add soy sauce.",
+"Season with pepper and salt.",
+"Mix well and serve."
+]
+},
+
+
+samosa:{
+name:"Vegetable Samosa",
+category:"Indian Snack",
+time:"45 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"2 cups flour",
+"3 potatoes",
+"Green peas",
+"Green chilli",
+"Ginger",
+"Chilli powder",
+"Garam masala",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Prepare dough using flour and water.",
+"Boil and mash potatoes.",
+"Cook potatoes with peas and spices.",
+"Roll small dough portions.",
+"Shape into cones.",
+"Fill with potato mixture.",
+"Seal the edges.",
+"Deep fry until golden.",
+"Serve with chutney."
+]
+},
+
+
+chapati:{
+name:"Soft Chapati",
+category:"Indian",
+time:"25 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups wheat flour",
+"Water",
+"Salt",
+"1 teaspoon oil"
+],
+
+steps:[
+"Add flour and salt to a bowl.",
+"Gradually add water.",
+"Knead into soft dough.",
+"Rest the dough for 15 minutes.",
+"Make small balls.",
+"Roll into thin circles.",
+"Cook on a hot tawa.",
+"Flip and cook both sides.",
+"Serve hot."
+]
+},
+
+
+chicken65:{
+name:"Chicken 65",
+category:"Indian Snack",
+time:"40 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"500g chicken",
+"½ cup yogurt",
+"1 tablespoon ginger garlic paste",
+"Chilli powder",
+"Turmeric",
+"Garam masala",
+"Rice flour",
+"Corn flour",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Cut chicken into small pieces.",
+"Mix chicken with yogurt and spices.",
+"Add rice flour and corn flour.",
+"Marinate for 30 minutes.",
+"Heat oil.",
+"Deep fry chicken pieces.",
+"Fry until crispy and golden.",
+"Serve hot with onion and lemon."
+]
+},
+
+
+chickenfry:{
+name:"Chicken Fry",
+category:"Indian",
+time:"35 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"500g chicken",
+"2 onions",
+"1 tablespoon ginger garlic paste",
+"Chilli powder",
+"Turmeric",
+"Garam masala",
+"Salt",
+"Cooking oil",
+"Curry leaves"
+],
+
+steps:[
+"Marinate chicken with spices.",
+"Heat oil in a pan.",
+"Add onions and curry leaves.",
+"Add chicken.",
+"Cook covered for 20 minutes.",
+"Remove lid and fry until golden.",
+"Add garam masala.",
+"Serve hot."
+]
+},
+
+
+samosa2:{
+name:"Onion Samosa",
+category:"Snack",
+time:"35 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"Samosa sheets",
+"2 onions",
+"Chilli powder",
+"Coriander powder",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Slice onions thinly.",
+"Mix onions with spices and salt.",
+"Fill samosa sheets.",
+"Fold into triangular shapes.",
+"Seal the edges.",
+"Heat oil.",
+"Deep fry until crispy.",
+"Serve with chutney."
+]
+},
+
+
+sandwich:{
+name:"Vegetable Sandwich",
+category:"Fast Food",
+time:"15 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"4 bread slices",
+"1 tomato",
+"1 onion",
+"1 cucumber",
+"Butter",
+"Green chutney",
+"Cheese",
+"Salt",
+"Black pepper"
+],
+
+steps:[
+"Spread butter on bread.",
+"Apply green chutney.",
+"Add tomato, onion and cucumber.",
+"Add cheese.",
+"Season with salt and pepper.",
+"Cover with another bread slice.",
+"Toast until golden.",
+"Cut and serve."
+]
+},
+
+
+gulabjamun:{
+name:"Gulab Jamun",
+category:"Indian Dessert",
+time:"40 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"1 cup milk powder",
+"2 tablespoons flour",
+"2 tablespoons milk",
+"1 teaspoon ghee",
+"1 cup sugar",
+"1 cup water",
+"Cardamom",
+"Cooking oil"
+],
+
+steps:[
+"Mix milk powder and flour.",
+"Add milk and ghee.",
+"Prepare a soft dough.",
+"Make small balls.",
+"Prepare sugar syrup.",
+"Heat oil.",
+"Fry balls on low flame until golden.",
+"Place fried balls in warm syrup.",
+"Rest for 1 hour before serving."
+]
+},
+
+
+kheer:{
+name:"Rice Kheer",
+category:"Indian Dessert",
+time:"45 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"½ cup rice",
+"1 litre milk",
+"½ cup sugar",
+"Cardamom",
+"Cashews",
+"Raisins",
+"Almonds"
+],
+
+steps:[
+"Wash the rice.",
+"Boil milk in a heavy pan.",
+"Add rice.",
+"Cook on low flame.",
+"Stir regularly.",
+"Add sugar.",
+"Add cardamom and dry fruits.",
+"Cook until thick.",
+"Serve warm or chilled."
+]
+},
+
+
+chocolatecake:{
+name:"Chocolate Cake",
+category:"Dessert",
+time:"50 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"1½ cups flour",
+"½ cup cocoa powder",
+"1 cup sugar",
+"2 eggs",
+"½ cup milk",
+"½ cup butter",
+"1 teaspoon baking powder",
+"Vanilla essence"
+],
+
+steps:[
+"Preheat oven to 180°C.",
+"Mix flour, cocoa and baking powder.",
+"Beat eggs, sugar and butter.",
+"Add milk and vanilla.",
+"Combine wet and dry ingredients.",
+"Pour into a greased cake tin.",
+"Bake for 30–35 minutes.",
+"Cool before serving."
+]
+},
+
+
+tacos:{
+name:"Vegetable Tacos",
+category:"Mexican",
+time:"25 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"Taco shells",
+"Mixed vegetables",
+"Onion",
+"Capsicum",
+"Cheese",
+"Tomato",
+"Chilli sauce",
+"Salt",
+"Black pepper"
+],
+
+steps:[
+"Heat oil in a pan.",
+"Cook onion and capsicum.",
+"Add mixed vegetables.",
+"Season with salt and pepper.",
+"Heat taco shells.",
+"Fill with vegetables.",
+"Add cheese.",
+"Add sauce and serve."
+]
+},
+
+
+manchurian:{
+name:"Vegetable Manchurian",
+category:"Indo-Chinese",
+time:"40 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"1 cup cabbage",
+"½ cup carrot",
+"½ cup flour",
+"2 tablespoons corn flour",
+"Garlic",
+"Ginger",
+"Soy sauce",
+"Chilli sauce",
+"Tomato sauce",
+"Salt"
+],
+
+steps:[
+"Mix vegetables with flour and corn flour.",
+"Make small balls.",
+"Deep fry until golden.",
+"Heat oil in another pan.",
+"Add garlic and ginger.",
+"Add soy, chilli and tomato sauce.",
+"Add fried Manchurian balls.",
+"Mix well and serve."
+]
+},
+
+
+pulihora:{
+name:"Pulihora",
+category:"South Indian",
+time:"25 Minutes",
+difficulty:"Easy",
+
+ingredients:[
+"2 cups cooked rice",
+"Tamarind",
+"Turmeric",
+"Peanuts",
+"Green chillies",
+"Mustard seeds",
+"Curry leaves",
+"Dry red chilli",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Cook and cool the rice.",
+"Prepare tamarind extract.",
+"Heat oil.",
+"Add mustard seeds and peanuts.",
+"Add chillies and curry leaves.",
+"Add turmeric and tamarind extract.",
+"Cook until thick.",
+"Mix with rice.",
+"Rest for 20 minutes and serve."
+]
+},
+
+
+rajma:{
+name:"Rajma Curry",
+category:"North Indian",
+time:"45 Minutes",
+difficulty:"Medium",
+
+ingredients:[
+"1 cup rajma",
+"2 onions",
+"2 tomatoes",
+"Ginger garlic paste",
+"Turmeric",
+"Chilli powder",
+"Coriander powder",
+"Garam masala",
+"Salt",
+"Cooking oil"
+],
+
+steps:[
+"Soak rajma overnight.",
+"Pressure cook until soft.",
+"Heat oil.",
+"Cook onions.",
+"Add ginger garlic paste.",
+"Add tomatoes and spices.",
+"Add cooked rajma.",
+"Simmer for 15 minutes.",
+"Add garam masala and serve."
+]
+}
+
+};
+
+
+/* =====================================================
+                    SEARCH
+===================================================== */
+
+function findRecipe(){
+
+const input=document
+.getElementById("foodInput")
+.value
+.trim()
+.toLowerCase();
+
+const result=document.getElementById("result");
+const error=document.getElementById("error");
+
+if(input===""){
+
+result.style.display="none";
+error.style.display="block";
+
+error.querySelector("h3").textContent=
+"⚠️ Enter a Food Name";
+
+error.querySelector("p").textContent=
+"Please type a food name.";
+
+return;
+}
+
+
+/* exact search */
+
+let recipe=recipes[input];
+
+
+/* flexible search */
+
+if(!recipe){
+
+const keys=Object.keys(recipes);
+
+const found=keys.find(function(key){
+
+return key.includes(
+input.replaceAll(" ","")
+);
+
+});
+
+if(found){
+
+recipe=recipes[found];
+
+}
+
+}
+
+
+/* keyword search */
+
+if(!recipe){
+
+const keywordMap={
+
+chicken:"chickencurry",
+rice:"friedrice",
+paneer:"paneerbuttermasala",
+egg:"eggcurry",
+dosa:"dosa",
+idli:"idli",
+pizza:"pizza",
+burger:"burger",
+pasta:"pasta",
+noodle:"noodles",
+noodles:"noodles",
+samosa:"samosa",
+chapati:"chapati",
+cake:"chocolatecake",
+kheer:"kheer",
+gulab:"gulabjamun",
+rajma:"rajma",
+taco:"tacos",
+manchurian:"manchurian",
+pulihora:"pulihora"
+};
+
+for(let word in keywordMap){
+
+if(input.includes(word)){
+
+recipe=recipes[keywordMap[word]];
+break;
+
+}
+
+}
+
+}
+
+
+/* NOT FOUND */
+
+if(!recipe){
+
+result.style.display="none";
+error.style.display="block";
+
+error.querySelector("h3").textContent=
+"😕 Recipe Not Found";
+
+error.querySelector("p").textContent=
+"Try Chicken Curry, Pizza, Biryani, Dosa, Paneer, Rice, Noodles, Samosa or another available food.";
+
+return;
+
+}
+
+
+error.style.display="none";
+
+
+/* INGREDIENTS */
+
+let ingredientsHTML="";
+
+recipe.ingredients.forEach(function(item){
+
+ingredientsHTML+=`
+<li>${item}</li>
+`;
+
+});
+
+
+/* STEPS */
+
+let stepsHTML="";
+
+recipe.steps.forEach(function(step,index){
+
+stepsHTML+=`
+
+<div class="step">
+
+<div class="step-number">
+${index+1}
+</div>
+
+<p>${step}</p>
+
+</div>
+
+`;
+
+});
+
+
+/* RESULT */
+
+result.innerHTML=`
+
+<div class="recipe-card">
+
+<div class="recipe-header">
+
+<h2>${recipe.name}</h2>
+
+<p>
+Delicious ${recipe.category}
+recipe that you can easily prepare at home.
+</p>
+
+<div class="recipe-info">
+
+<div class="info-box">
+🍽️ ${recipe.category}
+</div>
+
+<div class="info-box">
+⏱️ ${recipe.time}
+</div>
+
+<div class="info-box">
+⭐ ${recipe.difficulty}
+</div>
+
+</div>
+
+</div>
+
+
+<div class="recipe-body">
+
+
+<div>
+
+<h3 class="section-title">
+🛒 Ingredients
+</h3>
+
+<ul class="ingredients">
+
+${ingredientsHTML}
+
+</ul>
+
+</div>
+
+
+<div>
+
+<h3 class="section-title">
+👨‍🍳 Cooking Instructions
+</h3>
+
+${stepsHTML}
+
+</div>
+
+
+</div>
+
+</div>
+
+`;
+
+result.style.display="block";
+
+
+setTimeout(function(){
+
+document
+.getElementById("recipe")
+.scrollIntoView({
+behavior:"smooth"
+});
+
+},100);
+
+}
+
+
+/* =====================================================
+                  SAMPLE FOOD
+===================================================== */
+
+function selectFood(food){
+
+document.getElementById("foodInput").value=food;
+
+findRecipe();
+
+}
+
+
+/* =====================================================
+                    ENTER
+===================================================== */
+
+function handleEnter(event){
+
+if(event.key==="Enter"){
+
+findRecipe();
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
